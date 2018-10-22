@@ -1,0 +1,56 @@
+#!/bin/bash
+PATH=$PATH:/bin:/usr/bin:/sbin:/usr/sbin
+
+echo "nameserver 192.168.1.2" > /etc/resolv.conf
+
+#mount web data directory as ramfs
+WDDIR="/srv/www/data"
+mount -t ramfs ramfs $WDDIR
+cp -r $WDDIR.disk/* $WDDIR
+chown pltmrt.pltmrt $WDDIR -R
+# persist any changes in the ramfs in the data.disk directory
+while [ : ]; do cp $WDDIR/*{sqlite3,db} $WDDIR.disk -r; sleep 10; done &
+
+if [ ! -d /tmp/php5 ]; then
+  mkdir /tmp/php5
+  mkdir /tmp/php5/sessions
+fi
+/bin/su pltmrt -c "/usr/bin/mongoose /opt/etc/mongoose/mongoose.conf" &
+
+# restart stuborn udhcpd
+sleep 5
+/etc/init.d/udhcpd stop
+/etc/init.d/udhcpd start
+
+#starting the checkdev-script:
+if [ -x /opt/bin/check_dev ]; then
+  /opt/bin/check_dev /opt/2016-05-27-raspbian-jessie.img /opt/PLT_RPi-Update.tgz &
+fi
+
+ip6tables -F
+ip6tables -P INPUT DROP
+ip6tables -P FORWARD DROP
+ip6tables -P OUTPUT DROP
+
+iptables -F
+iptables -t nat -F
+iptables -t nat -A PREROUTING -p tcp --dport 80  -j REDIRECT --to-port 8080
+iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8443
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp --dport 8080 -j ACCEPT
+iptables -A INPUT -p tcp --dport 8443 -j ACCEPT
+iptables -A INPUT -p udp --dport 67 -j ACCEPT
+iptables -A INPUT -p tcp --dport 53 -j ACCEPT
+iptables -A INPUT -p udp --dport 53 -j ACCEPT
+
+iptables -A INPUT -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p udp --sport 68 -j ACCEPT
+
+tcpdump -i eth0 -w /var/lib/misc/tcpdump-eth0-$(date +%d%m%Y_%H%M).pcap &
+exit 0
