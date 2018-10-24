@@ -7,8 +7,6 @@ cd /home/makerspace/Downloads/
 if [ ! -e $CURRENT_IMAGE ]; then
 	echo "Die aktuelle Version von Raspbian wird heruntergeladen"
 	
-	#rm *-raspbian-*-lite.img
-
 	wget "$RASPBIAN_DOWNLOAD_URI" -O raspbian_lite_latest.zip
 	unzip /home/makerspace/Downloads/raspbian_lite_latest.zip
 	# Always remove the file - in case download was interrupted and zip is partial, this will retrigger download
