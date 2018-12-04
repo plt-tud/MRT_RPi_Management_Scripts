@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_IMAGE=2018-10-09-raspbian-stretch-lite.img
+CURRENT_IMAGE=2018-11-13-raspbian-stretch-lite.img
 RASPBIAN_DOWNLOAD_URI="https://downloads.raspberrypi.org/raspbian_lite_latest"
 
 cd /home/makerspace/Downloads/
