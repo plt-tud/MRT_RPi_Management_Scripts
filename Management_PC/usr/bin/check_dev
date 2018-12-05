@@ -41,7 +41,8 @@ function updateNewDevices(){					#checks for new devices and puts them into $NEW
 function installNewDevices(){					#starts the installation-process for each new device ( in Array $NEWDEVICES_AR[] )
 	for NEWDEVICE in ${NEWDEVICES_AR[*]}; do
 		echo "starting the installation-process on device: " $NEWDEVICE
-    $(readlink -f $(find -path "*/install_raspbian.sh"))  "$IMGFILE" "/dev/$NEWDEVICE" "$UPDATE"
+/home/makerspace/MRT_RPi_Management_Scripts/Management_PC/usr/bin/install_raspbian.sh "$IMGFILE" "/dev/$NEWDEVICE" "$UPDATE"
+    #$(readlink -f $(find -path "*/install_raspbian.sh"))  "$IMGFILE" "/dev/$NEWDEVICE" "$UPDATE"
     echo "Sie können nun einen neuen USB-Stick einstecken..."
 	done
 }
