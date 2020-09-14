@@ -48,11 +48,12 @@ function installNewDevices(){					#starts the installation-process for each new 
 }
 
 
-
-
-
-
 #MAIN:
+
+if [ $(ps -ax |grep "check_dev" | wc -l) -gt 3 ] ;  then
+	echo "Exiting check_dev as already running!!!"
+	exit 1
+fi
 
 echo "Handle this script with care! It can overwrite a partition, i.e. usb-sticks"
 
